@@ -8,9 +8,16 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { isRole, type Role } from "@/lib/auth-fields";
 
 const inputClass =
   "h-10 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#5b6ef7]/60 focus:ring-2 focus:ring-[#5b6ef7]/30";
+
+const ROLES = [
+  { value: "seeker", label: "Seeker", hint: "Looking for work" },
+  { value: "recruiter", label: "Recruiter", hint: "Hiring talent" },
+  { value: "admin", label: "Admin", hint: "Platform access" },
+] as const satisfies ReadonlyArray<{ value: Role; label: string; hint: string }>;
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -18,6 +25,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     React.useState(false);
+  const [role, setRole] = React.useState<Role>("seeker");
   const [loading, setLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -34,11 +42,17 @@ export default function SignUpPage() {
     const confirmPassword = String(
       formData.get("confirmPassword") ?? "",
     );
+    const submittedRole = String(formData.get("role") ?? "");
 
     setErrorMessage("");
 
     if (!name || !email || !password || !confirmPassword) {
       setErrorMessage("Please fill in all fields.");
+      return;
+    }
+
+    if (!isRole(submittedRole)) {
+      setErrorMessage("Please select whether you are a seeker, recruiter, or admin.");
       return;
     }
 
@@ -60,6 +74,7 @@ export default function SignUpPage() {
         email,
         password,
         callbackURL: "/",
+        role: submittedRole,
       });
 
       if (error) {
@@ -120,6 +135,53 @@ export default function SignUpPage() {
             placeholder="you@example.com"
             className={inputClass}
           />
+        </div>
+
+        {/* Account type */}
+        <div
+          className="flex flex-col gap-2"
+          role="radiogroup"
+          aria-label="I am a"
+        >
+          <span className="text-sm font-medium text-white/80">
+            I am a
+          </span>
+
+          <div className="grid grid-cols-3 gap-2">
+            {ROLES.map((option) => {
+              const selected = role === option.value;
+
+              return (
+                <label
+                  key={option.value}
+                  className={`cursor-pointer rounded-lg border px-2 py-2.5 text-center transition-colors focus-within:ring-2 focus-within:ring-[#5b6ef7]/30 ${
+                    selected
+                      ? "border-[#5b6ef7]/60 bg-[#5b6ef7]/10"
+                      : "border-white/10 bg-white/[0.04] hover:border-white/20"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={option.value}
+                    checked={selected}
+                    onChange={() => setRole(option.value)}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`block text-sm font-medium ${
+                      selected ? "text-white" : "text-white/80"
+                    }`}
+                  >
+                    {option.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-white/50">
+                    {option.hint}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
         </div>
 
         {/* Password */}

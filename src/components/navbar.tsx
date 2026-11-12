@@ -16,6 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useSession , signOut } from "@/lib/auth-client";
 
 const navLinks = [
   { href: "/jobs", label: "Browse Jobs" },
@@ -26,7 +27,8 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
-
+  const {data:session} = useSession();
+  console.log("hire session", session);
   const close = () => setOpen(false);
 
   const logo = (
@@ -45,6 +47,10 @@ export function Navbar() {
       />
     </Link>
   );
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
 
   return (
     <header className="dark sticky top-0 z-50 text-foreground">
@@ -76,7 +82,19 @@ export function Navbar() {
 
             <span aria-hidden className="h-4 w-px bg-white/10" />
 
-            <Link
+           { session?.user ?
+            <>
+              <span className="text-[#ededef]">Wellcome, {session.user.name}</span>
+                <Button
+              onClick={handleSignOut}
+              className="text-sm font-medium text-[#5b6ef7] transition-colors hover:text-[#7c8dff] focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              Sign out
+            </Button>
+            </>
+           :
+            <>
+               <Link
               href="/sign-in"
               className="text-sm font-medium text-[#5b6ef7] transition-colors hover:text-[#7c8dff] focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
@@ -94,6 +112,8 @@ export function Navbar() {
             >
               Get Started
             </Link>
+            </>
+           }
           </div>
 
           {/* Mobile navigation */}

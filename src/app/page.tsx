@@ -34,7 +34,7 @@ export default function Home() {
         {/* Globe: box fitted so the sphere crest sits at ~86% height and the
             limb edges match the target at y828-900. No mask — the image's
             own soft alpha edge provides the aura hugging the limb. */}
-        <div className="absolute left-[-13%] top-[-10.9%] h-[230.9%] w-[163.6%] bg-[url('/images/globe-clean.png')] bg-[length:100%_100%] bg-no-repeat" />
+        <div className="absolute left-[-15%] top-[-20.9%] h-[220.9%] w-[130.6%] bg-[url('/images/globe-clean.png')] bg-[length:100%_100%] bg-no-repeat" />
         {/* Background glows fitted to the target's median luminance profile:
             a broad top band, a bright upper-left core, a lower-left core, a
             right-edge core, and a faint bottom-left afterglow. */}
